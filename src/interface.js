@@ -38,6 +38,14 @@ export class FactorioInterface extends EventEmitter {
         this.send(new LuaCommand("print(1)", { isSilent: false, serverOnly: false}));
         this.send(new LuaCommand("print(1)", { isSilent: false, serverOnly: false}));
         this.send(new LuaCommand("_G.isServer = true;", { isSilent: true, serverOnly: false}));
+        // Load the command splitter
+        this.loadLuaFile("interface/spliter.lua");
+        // Load the json encoder for bootstrap to work.
+        this.loadLuaFile("interface/json_encoder.lua");
+        // Load the interface lua script
+        this.loadLuaFile("interface/bootstrap.lua");
+        // load the serializers
+        this.loadLuaFile("interface/serialize.lua");
         setTimeout(() => {
           this.emit("ready", 1);
         }, 100);
@@ -110,7 +118,7 @@ export class FactorioInterface extends EventEmitter {
         throw "JSON Mismatch received chunk "+portion+" expected "+this.expectChunkNumber;
       }
       this.expectChunkNumber = portion+1;
-      if (portion != total && line.length < 2000) { // Magic number to be replaced. 
+      if (portion != total && line.length < 2000) { // Magic number to be replaced.
         console.log("Enabling debug mode for the next 10 lines, mismatch of length of json found.");
         console.log(arguments);
         this.debug = true;

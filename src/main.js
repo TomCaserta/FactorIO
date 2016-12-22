@@ -10,13 +10,7 @@ function getPlayers () {
 }
 
 inter.on("ready", () => {
-  // Load the command splitter
-  inter.loadLuaFile("spliter.lua");
-  // Load the json encoder for bootstrap to work.
-  inter.loadLuaFile("json_encoder.lua");
-  // Load the interface lua script
-  inter.loadLuaFile("bootstrap.lua");
-  inter.loadLuaFile("serialize.lua");
+
   inter.loadLuaFile("functions.lua");
 
   // todo: check players and then load this..
