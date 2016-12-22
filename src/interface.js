@@ -97,8 +97,9 @@ export class FactorioInterface extends EventEmitter {
         this.emit("start", 1);
       }
     }
+    if (line.match(/))
     if (line.indexOf("Cannot execute command.") != -1) {
-      console.error(line);
+      this.emit("factorio_error", line);
     }
     let isStartJSON = words[0] == "FACTORIO_JSON";
     if (this.debug) {
@@ -113,19 +114,16 @@ export class FactorioInterface extends EventEmitter {
       let portion = parseInt(amountIndication[0]);
       let total = parseInt(amountIndication[1]);
       let json = this.cutLine + chunk;
-      console.log("<RECIEVED< JSON PART",portion,"OF",total,"LENGTH",line.length, "SUBSTR", words[0].length+words[1].length+2, line.length-1);
+
       if (portion != this.expectChunkNumber) {
         throw "JSON Mismatch received chunk "+portion+" expected "+this.expectChunkNumber;
       }
       this.expectChunkNumber = portion+1;
       if (portion != total && line.length < 2000) { // Magic number to be replaced.
-        console.log("Enabling debug mode for the next 10 lines, mismatch of length of json found.");
-        console.log(arguments);
         this.debug = true;
         this.debugLines = 10;
       }
       if (portion >= total) {
-        console.log("<RECIEVED< FULL JSON RESPONSE RECEIVED, PARSING");
         try {
           let results = JSON.parse(json);
           this.cutLine = "";
@@ -134,15 +132,15 @@ export class FactorioInterface extends EventEmitter {
             responder.resolve(results.result);
             delete this.awaiting[results.id];
           }
+          else if (results.event_id != null) {
+            this.emit(results.event_id, results);
+          }
           //console.log("<RECIEVED<",json);
         }
         catch(e) {
-          const fs = require("fs");
-           fs.writeFileSync("debug/json.json", json);
-          console.log("Error in parsing JSON response", e, "dumped to debug output");
+          this.emit("error", e);
         }
-
-          this.expectChunkNumber = 0;
+        this.expectChunkNumber = 0;
       }
       else {
           this.cutLine = json;

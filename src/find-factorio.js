@@ -17,8 +17,12 @@ const search_directories = [
    '%PROGRAMFILES(x86)%\\Steam\\steamapps\\common\\Factorio\\bin\\x64'
 ];
 
-
-export function findExecutableDirectory () {
+/**
+ * Gets the executable from the config, if none exists in the config
+ * then it attempts to find it in the default install locations.
+ * @return {string} The path of the factorio binary
+ */
+export function findExecutable () {
     if (DIRECTORY_FOUND) return FACTORIO_DIRECTORY;
 
     if (config.has("binary_path")) {
@@ -41,18 +45,29 @@ export function findExecutableDirectory () {
    return FACTORIO_LOCATION;
 }
 
-
+/**
+ * Finds the working directory for the executable to run in
+ * @return {string} The directory factorio resides in
+ */
 export function findWorkingDirectory () {
     findExecutableDirectory();
     return WORKING_DIR;
 }
 
-
+/**
+ * Gets the app directory from the config file or uses
+ * default windows location
+ * @return {string} The application data directory
+ */
 export function getAppDirectory () {
   return APP_DIR;
 }
 
-
+/**
+ * Resolves a string using the process environment variables
+ * @param  {string} str string to resolve
+ * @return {string}     resolved string
+ */
 function resolve (str) {
   return str.replace(/%([^%]+)%/g, function(_,n) {
     return process.env[n];
