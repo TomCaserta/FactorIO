@@ -482,18 +482,66 @@ local function object_or_array(self, T, etc)
    end
    return string_keys, nil, map
 end
-
-local _pairs = pairs
-function pairs (value)
-  if type(value) == "userdata" then
-    local g = getmetatable(value)
-    return g.__pairs(value)
-  else
-    return _pairs(value) -- original
+function getFields (obj)
+  local help = obj.help();
+  local isFields = false;
+  local fields = {};
+  local isRW = false;
+  local debug = "";
+  local i = 1;
+  for word in help:gmatch("%S+") do
+    debug = debug .. " ".. word;
+      if (isFields) then
+        if (isRW) then
+          isRW =true;
+          fields[i] = word;
+          i = i + 1; -- Yes manyally doing this. Wasn working with hash count
+        else
+          isRW = false;
+        end
+      end
+      if (word == "Values:") then
+        game.player.print("Found word of values");
+        isFields = true;
+      end
   end
+
+  game.player.print(debug);
+  game.player.print(serpent.dump(fields));
+  return fields;
 end
+
+function _isUserdata (obj)
+  if (type(obj.__self) == "userdata") then
+    return true;
+  end
+  return false;
+end
+
+function isUserdata (obj)
+  if (type(obj) == "userdata") then return true; end;
+  status, result = pcall(_isUserdata, obj);
+  if not status then
+    return false;
+  end
+  return result;
+end
+
+function serializeUserdata (obj)
+   status, result = pcall(getFields, obj);
+   if not status then
+     return {};
+   else
+     local tab = {};
+     for k, v in ipairs(result) do
+       tab[v] = obj[v];
+     end
+     return tab;
+   end
+end
+
 local encode_value
-function encode_value(self, value, parents, etc, options, indent, for_key)
+function encode_value(self, value, parents, etc, options, indent, for_key, otherKey)
    if value == nil or (not for_key and options and options.null and value == options.null) then
       return 'null'
    elseif type(value) == 'string' then
@@ -510,8 +558,9 @@ function encode_value(self, value, parents, etc, options, indent, for_key)
       end
    elseif type(value) == 'boolean' then
       return tostring(value)
-   elseif type(value) ~= 'table' and type(value) ~= 'userdata' then
-      self:onEncodeError("can't convert " .. type(value) .. " to JSON", etc)
+   elseif type(value) ~= 'table' then
+      game.write_file("json_debug.log",serpent.dump(parents));
+      self:onEncodeError("can't convert " .. tostring(otherKey) .. " as its type is " .. type(value) .. " to JSON", etc)
    elseif getmetatable(value) == isNumber then
       return tostring(value)
    else
@@ -532,7 +581,7 @@ function encode_value(self, value, parents, etc, options, indent, for_key)
       if maximum_number_key then
          local ITEMS = { }
          for i = 1, maximum_number_key do
-            table.insert(ITEMS, encode_value(self, T[i], parents, etc, options, indent))
+            table.insert(ITEMS, encode_value(self, T[i], parents, etc, options, indent, nil, i))
          end
          if options.pretty then
             result_value = "[ " .. table.concat(ITEMS, ", ") .. " ]"
@@ -545,7 +594,7 @@ function encode_value(self, value, parents, etc, options, indent, for_key)
             local KEYS = { }
             local max_key_length = 0
             for _, key in pairs(object_keys) do
-               local encoded = encode_value(self, tostring(key), parents, etc, options, indent, true)
+               local encoded = encode_value(self, tostring(key), parents, etc, options, indent, true, key)
                if options.align_keys then
                   max_key_length = math.max(max_key_length, #encoded)
                end
@@ -556,15 +605,15 @@ function encode_value(self, value, parents, etc, options, indent, for_key)
             local FORMAT = "%s%" .. string.format("%d", max_key_length) .. "s: %s"
             local COMBINED_PARTS = { }
             for i, key in pairs(object_keys) do
-               local encoded_val = encode_value(self, TT[key], parents, etc, options, subtable_indent)
+               local encoded_val = encode_value(self, TT[key], parents, etc, options, subtable_indent, nil, key)
                table.insert(COMBINED_PARTS, string.format(FORMAT, key_indent, KEYS[i], encoded_val))
             end
             result_value = "{\n" .. table.concat(COMBINED_PARTS, ",\n") .. "\n" .. indent .. "}"
          else
             local PARTS = { }
             for _, key in ipairs(object_keys) do
-               local encoded_val = encode_value(self, TT[key],       parents, etc, options, indent)
-               local encoded_key = encode_value(self, tostring(key), parents, etc, options, indent, true)
+               local encoded_val = encode_value(self, TT[key],       parents, etc, options, indent, nil, key)
+               local encoded_key = encode_value(self, tostring(key), parents, etc, options, indent, true, key)
                table.insert(PARTS, string.format("%s:%s", encoded_key, encoded_val))
             end
             result_value = "{" .. table.concat(PARTS, ",") .. "}"
@@ -577,7 +626,7 @@ function encode_value(self, value, parents, etc, options, indent, for_key)
    end
 end
 local function top_level_encode(self, value, etc, options)
-   local val = encode_value(self, value, {}, etc, options)
+   local val = encode_value(self, value, {}, etc, options, nil, nil, "__ROOT__")
    if val == nil then
       return val
    else

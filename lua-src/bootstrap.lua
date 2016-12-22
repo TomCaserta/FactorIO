@@ -9,7 +9,21 @@ function respondTo (result, id)
     result = result,
     id = id
   };
-  print("FACTORIO_JSON ".._G["JSON"]:encode(toEncode));
+  local splitOn = 2000;
+  local resp = _G["JSON"]:encode(toEncode):gsub("%\n", "\\n");
+  local splitText = split(resp, splitOn)
+  local count = math.ceil(resp:len() / splitOn)
+  for i=1,#splitText do
+    print("FACTORIO_JSON "..tostring(i).."/"..tostring(count).." "..splitText[i]);
+  end
 end
-
 _G["respondTo"] = respondTo;
+
+local function split(text, length)
+    local strings = {}
+    for i=1, #text, length do
+        strings[#strings+1] = text:sub(i, i + length - 1)
+    end
+    return strings
+end
+_G["split"] = split;

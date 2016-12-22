@@ -45,7 +45,7 @@ function startFactorio (options = { environment: null, args: [], cwd: "" }) {
     ValvePlatformMutex: "c:/program files (x86)/steam/steam.exe",
     INSTALLDIR: WORKING_DIR + "\\..\\..\\"
   },
-  cols: 200000
+  cols: 2500
   });
   return factorio;
 }

@@ -43,14 +43,28 @@ export default class LuaCommand {
       packets.push(this.getCommand() +code);
     }
     else if (this.serverOnly) {
-      let codeBefore = "buf.a('s','";
-      let codeAfter  = "')";
-      const splitCode = text(jsesc(code), 4094 - this.getCommand().length - codeBefore.length - codeAfter.length);
+      let codeBefore = "if (_G.isServer ~= nil) then; buf.a('s','";
+      let codeAfter  = "'); end;";
+
+      let escaped = jsesc(code);
+      let minifiedOutput = "";
+      // TODO: Fix actual edge case where if the split code happens on an escaped boundary
+      // it splits the code incorrectly and causes an error. For now I have split it
+      // with 1000 characters to spare to avoid this.
+      // So if there is a lot of escaping going on we might have an issue...
+      const splitCode = text(code, 3094 - this.getCommand().length - codeBefore.length - codeAfter.length);
+
       for (let x = 0; x < splitCode.length; x++) {
-        let curr = splitCode[x];
+        let uM = splitCode[x];
+        minifiedOutput += uM;
+        let curr = jsesc(uM);
         packets.push(this.getCommand() +codeBefore+curr+codeAfter);
       }
-      packets.push(this.getCommand()+"buf.e('s');");
+      packets.push(this.getCommand()+" if (_G.isServer ~= nil) then;  buf.e('s'); end;");
+      console.log("ProjectIO To Send> ",minifiedOutput);
+      // Uncomment to debug
+      const fs = require("fs");
+      fs.writeFileSync("./debug/command-"+md5(code)+".min.lua", minifiedOutput);
     }
     else {
       throw new Exception("Cannot send lua as it is too large to send via console. Splitting requires having the splitter across all clients. This is not implemented yet.");

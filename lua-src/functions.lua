@@ -1,68 +1,55 @@
 function getPlayers ()
-  local data = {};
-  for i, v in ipairs(game.connected_players) do
-    data[i] = serializePlayer(v);
-  end
+  local data = serializeTable(game.connected_players, serializePlayer);
+  -- dumpLog();
   return data;
 end
-
-function serializePlayer (player)
-  if (player == nil) then return nil; end
-  return {
-    name = player.name,
-    index = player.index,
-    color = serializeColor(player.color),
-    tag = player.tag,
-    connected = player.connected,
-    admin = player.admin,
-    afk_time = player.afk_time,
-    online_time = player.online_time,
-    valid = player.valid
-  };
-end
-
-function serializeControl (control)
-  return {
-    surface = serializeSurface(control.surface)
-  };
-end
-
-function serializeSurface (surface)
-  if (surface == nil) then return null; end
-  return {
-    name = surface.name,
-    index = surface.index,
-    map_gen_settings = serializeMapGenSettings(surface.map_gen_settings),
-    always_day = surface.always_day,
-    daytime = surface.daytime,
-    darkness = surface.darkness,
-    wind_speed = surface.wind_speed,
-    wind_orientation = surface.wind_orientation,
-    wind_orientation_change = surface.wind_orientation_change,
-    peaceful_mode = surface.peaceful_mode,
-    valid = surface.valid
-  };
-end
-
-function serializePosition (position)
-  if (position == nil) then return nil; end
-  return {
-    x = position.x,
-    y = position.y
-  };
-end
-
-function serializeColor (color)
-  if (color == nil) then return nil; end
-  return {
-    r = color.r,
-    g = color.g,
-    b = color.b,
-    a = color.a
-  };
-end
-
-function mergeTable (t1, t2)
-for k,v in pairs(t2) do t1[k] = v end
-end
 _G["getPlayers"] = getPlayers;
+
+function getSurfaces ()
+  return serializeTable(game.surfaces, serializeSurface)
+end
+
+local tile_cache = {}
+local tile_cache_arr = {}
+local tile_cache_inc = 1
+function getTileID (name)
+  if not tile_cache[name] then
+    tile_cache[name] = tile_cache_inc;
+    tile_cache_arr[tile_cache_inc] = name;
+    tile_cache_inc = tile_cache_inc+1
+    return tile_cache_inc-2
+  end
+  return tile_cache[name]-1
+end
+function getTiles (surfaceIndex, chunkX, chunkY)
+  local chunkSize = 32
+  local tiles = {}
+  local n = 1
+  for x = 1, chunkSize do
+    for y = 1, chunkSize do
+      local tile = game.surfaces[surfaceIndex].get_tile((chunkX * chunkSize) + x, (chunkY * chunkSize) + y)
+      tiles[n] = getTileID(tile.name)
+      n = n + 1
+    end
+  end
+  return tiles
+end
+
+function getSurfaceTiles (surfaceIndex)
+  local map = { ids={}, tiles = {} }
+  local surface = game.surfaces[surfaceIndex]
+  local tiles = map["tiles"]
+  for chunk in surface.get_chunks() do
+    if surface.is_chunk_generated(chunk) then
+      if max == 0 then
+        break
+      end
+      if not tiles[chunk.x] then
+        tiles[chunk.x] = {}
+      end
+      tiles[chunk.x..","..chunk.y] = getTiles(surfaceIndex, chunk.x, chunk.y)
+    end
+  end
+  map["ids"] = tile_cache_arr
+  return map
+end
