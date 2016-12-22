@@ -1,0 +1,20 @@
+{
+    "binary_path": "",
+    "binary_name": "",
+    "data_path": "",
+    "server": {
+        "port": 30032,
+        "rcon": {
+            "port": 30033,
+            "username": "admin",
+            "password": true
+        },
+        "environment": "server-io",
+        "map": "test.zip"
+    },
+    "run_game": true,
+    "advanced": {
+      "term_width": 2000,
+      "__COMMENT": "Terminal width is the spawned fake terminal width, adjusting this will require you to change it in the lua responder"
+    }
+}
