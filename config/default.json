@@ -2,17 +2,27 @@
     "binary_path": "",
     "binary_name": "",
     "data_path": "",
+    "is_steam": true,
+    "__COMMENT": "Load with steam environment variables to stop it from losing the output of the game when launched with steam",
     "server": {
         "port": 30032,
+        "host": "127.0.0.1",
         "rcon": {
             "port": 30033,
-            "username": "admin",
-            "password": true
+            "password": null,
+            "__COMMENT": "Set password to null to automatically generate a password. RCON may be required in the future so ProjectIO needs to know about it."
         },
         "environment": "server-io",
         "map": "test.zip"
     },
-    "run_game": true,
+    "client": {
+      "enabled": true,
+      "arguments": [
+        "--mp-connect.host=127.0.0.1:30033"
+      ],
+      "environment": "",
+      "__COMMENT": "Enable or disable auto spawning a client and connecting to the ProjectIO server."
+    },
     "advanced": {
       "term_width": 2000,
       "__COMMENT": "Terminal width is the spawned fake terminal width, adjusting this will require you to change it in the lua responder"
