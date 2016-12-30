@@ -1,4 +1,4 @@
-import ProjectIOError from "ProjectIOError";
+import ProjectIOError from "./ProjectIOError";
 
 export default class JsonParseError extends ProjectIOError {
   constructor (jsonError) {

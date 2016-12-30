@@ -61,7 +61,7 @@ export default class LuaCommand {
         packets.push(this.getCommand() +codeBefore+curr+codeAfter);
       }
       packets.push(this.getCommand()+" if (_G.isServer ~= nil) then;  buf.e('s'); end;");
-      console.log("ProjectIO To Send> ",minifiedOutput);
+      //console.log("ProjectIO To Send> ",minifiedOutput);
       // Uncomment to debug
       const fs = require("fs");
       fs.writeFileSync("./debug/command-"+md5(code)+".min.lua", minifiedOutput);

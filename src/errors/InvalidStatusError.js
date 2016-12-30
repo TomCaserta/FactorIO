@@ -1,4 +1,4 @@
-import ProjectIOError from "ProjectIOError";
+import ProjectIOError from "./ProjectIOError";
 import FactorioStatus from "../wrapper/FactorioStatus";
 
 export default class InvalidStatusError extends ProjectIOError {

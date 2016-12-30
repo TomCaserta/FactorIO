@@ -1,7 +1,7 @@
 import JsonChunkUnexpectedError from "../errors/JsonChunkUnexpectedError";
 import JsonChunkIncompleteError from "../errors/JsonChunkIncompleteError";
 
-export default class JsonChunk () {
+export default class JsonChunk {
   constructor (chunkAmount) {
     this.chunks = new Array(chunkAmount);
     this.length = chunkAmount;

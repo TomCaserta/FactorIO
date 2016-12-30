@@ -1,4 +1,4 @@
-import ProjectIOError from "ProjectIOError";
+import ProjectIOError from "./ProjectIOError";
 
 export default class FactorioCommandError extends ProjectIOError {
   constructor (commandLine) {

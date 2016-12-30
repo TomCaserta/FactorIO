@@ -1,4 +1,4 @@
-import ProjectIOError from "ProjectIOError";
+import ProjectIOError from "./ProjectIOError";
 
 export default class JsonChunkIncompleteError extends ProjectIOError {
   constructor (chunk) {

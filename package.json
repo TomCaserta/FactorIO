@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "babel-preset-node7": "^1.4.0",
+    "blessed": "^0.1.81",
     "config": "^1.24.0",
     "event-emitter-es6": "^1.1.5",
     "fs-promise": "^1.0.0",
@@ -26,6 +27,10 @@
     "uuid": "^3.0.1"
   },
   "devDependencies": {
+    "babel-plugin-syntax-async-functions": "^6.13.0",
+    "babel-plugin-transform-class-properties": "^6.19.0",
+    "babel-plugin-transform-react-jsx": "^6.8.0",
+    "babel-plugin-transform-regenerator": "^6.21.0",
     "camelcase": "^4.0.0",
     "cheerio": "^0.22.0",
     "glob": "^7.1.1",

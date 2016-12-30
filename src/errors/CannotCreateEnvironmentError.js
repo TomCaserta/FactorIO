@@ -1,4 +1,4 @@
-import ProjectIOError from "ProjectIOError";
+import ProjectIOError from "./ProjectIOError";
 
 export default class CannotCreateEnvironmentError extends ProjectIOError {
   constructor (wrappedError) {

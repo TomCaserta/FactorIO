@@ -2,10 +2,11 @@ import fs from "fs";
 import path from "path";
 
 import config from "./config.js";
+import baseConfig from "config";
 
 let DIRECTORY_FOUND = false;
 let FACTORIO_DIRECTORY = null;
-let BINARY_NAME = "factorio.exe";
+let BINARY_NAME = config("binary_name", "factorio.exe");
 let FACTORIO_LOCATION = null;
 let WORKING_DIR = null;
 let APP_DIR = config("data_path", resolve("%APPDATA%\\Factorio\\config"));
@@ -25,9 +26,10 @@ const search_directories = [
 export function findExecutable () {
     if (DIRECTORY_FOUND) return FACTORIO_DIRECTORY;
 
-    if (config.has("binary_path")) {
-      FACTORIO_DIRECTORY = config.get("binary_path");
+    if (baseConfig.has("binary_path")) {
+      FACTORIO_DIRECTORY = path.join(baseConfig.get("binary_path"), BINARY_NAME);
       DIRECTORY_FOUND = true;
+      WORKING_DIR = baseConfig.get("binary_path");
       return FACTORIO_DIRECTORY;
     }
 
@@ -50,7 +52,7 @@ export function findExecutable () {
  * @return {string} The directory factorio resides in
  */
 export function findWorkingDirectory () {
-    findExecutableDirectory();
+    findExecutable();
     return WORKING_DIR;
 }
 

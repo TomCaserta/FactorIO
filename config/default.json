@@ -1,7 +1,7 @@
 {
-    "binary_path": "",
-    "binary_name": "",
-    "data_path": "",
+    "binary_path": "/Users/Tom/Library/Application Support/Steam/steamapps/common/Factorio/factorio.app/Contents/MacOS/",
+    "binary_name": "factorio",
+    "data_path": "/Users/Tom/Library/Application Support/factorio",
     "is_steam": true,
     "__COMMENT": "Load with steam environment variables to stop it from losing the output of the game when launched with steam",
     "server": {
@@ -13,7 +13,7 @@
             "__COMMENT": "Set password to null to automatically generate a password. RCON may be required in the future so ProjectIO needs to know about it."
         },
         "environment": "server-io",
-        "map": "test.zip"
+        "map": "test"
     },
     "client": {
       "enabled": true,

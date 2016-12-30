@@ -1,13 +1,13 @@
-export class FactorioStatus {
-  static const ERROR = 0;
-  static const NOT_INITIALIZED = 1;
-  static const CREATING_ENVIRONMENT = 2;
-  static const CREATED_ENVIRONMENT = 3;
-  static const STARTED = 4;
-  static const STOPPED = 5;
+export default class FactorioStatus {
+  static ERROR = 0;
+  static NOT_INITIALIZED = 1;
+  static CREATING_ENVIRONMENT = 2;
+  static CREATED_ENVIRONMENT = 3;
+  static STARTED = 4;
+  static STOPPED = 5;
 
   /** Helper Statuses **/
-  static const CAN_START = [
+  static CAN_START = [
     FactorioStatus.CREATED_ENVIRONMENT,
     FactorioStatus.STOPPED
   ]
@@ -38,7 +38,7 @@ export class FactorioStatus {
       }
     }
     for (let i = 0; i < toCheck.length; i++) {
-      if (toCheck[i] == n) {
+      if (toCheck[i] == status) {
         return true;
       }
     }
